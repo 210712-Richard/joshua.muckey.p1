@@ -1,6 +1,6 @@
 package com.revature.models;
 
-public interface Role {
+public abstract class Role {
 
-	
+	String name;
 }

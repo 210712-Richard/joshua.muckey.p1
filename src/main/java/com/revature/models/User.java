@@ -1,33 +1,39 @@
 package com.revature.models;
 
-import java.util.HashSet;
 import java.util.Objects;
 
-public class User {
 
+public class User {
+	
 	private String username;
 	private String password;
-	private String email;
-	private String firstName;
-	private String lastName;
-	private HashSet<Role> roles = new HashSet<Role>();
+	private BasicInfo info;
+	private Employee role;
 	private Department dept;
 	private String directSupervisor;
 	private Double pendingBalance;
 	private Double awardedBalance;
-	private Session session;
 
-	public User(String username, String password, String email, String firstName, String lastName, Role role,
+	public User(String username, String password, String email, String firstName, String lastName, Employee role,
 			Department dept, String directSupervisor) {
 		this();
 		this.username = username;
 		this.password = password;
-		this.email = email;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		roles.add(role);
+		info = new BasicInfo(firstName, lastName,email);
+		this.role = role;
 		this.dept = dept;
 		this.directSupervisor = directSupervisor;
+	}
+	public User(String username, String password, String email, String firstName, String lastName, String role,
+			String dept, String directSupervisor, double pendingbalance, double awardedbalance) {
+		this.username = username;
+		this.password = password;
+		info = new BasicInfo(firstName, lastName,email);
+		this.role = (Employee) RoleFactory.getRole(role);
+		this.dept = Department.valueOf(dept);
+		this.directSupervisor = directSupervisor;
+		this.pendingBalance = pendingbalance;
+		this.awardedBalance = awardedbalance;
 	}
 
 	public User() {
@@ -53,39 +59,20 @@ public class User {
 		this.password = password;
 	}
 
-	public String getEmail() {
-		return email;
+	public BasicInfo getInfo() {
+		return info;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setInfo(BasicInfo info) {
+		this.info = info;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public Role getRole() {
+		return role;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public boolean checkRole(Role role) {
-		return roles.contains(role);
-	}
-
-	public boolean addRole(Role role) {
-		return roles.add(role);
-	}
-	public boolean removeRole(Role role) {
-		return roles.remove(role);
+	public void setRole(Employee role) {
+		this.role = role;
 	}
 
 	public Department getDept() {
@@ -122,16 +109,15 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + ", email=" + email + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", roles=" + roles + ", dept=" + dept + ", directSupervisor="
-				+ directSupervisor + ", pendingBalance=" + pendingBalance + ", awardedBalance=" + awardedBalance
-				+ ", session=" + session + "]";
+		return "User [username=" + username + ", password=" + password + ", info=" + info + ", role=" + role
+				+ ", dept=" + dept + ", directSupervisor=" + directSupervisor + ", pendingBalance=" + pendingBalance
+				+ ", awardedBalance=" + awardedBalance + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(awardedBalance, dept, directSupervisor, email, firstName, lastName, password,
-				pendingBalance, roles, session, username);
+		return Objects.hash(awardedBalance, dept, directSupervisor, info, password, pendingBalance, role,
+				username);
 	}
 
 	@Override
@@ -144,19 +130,10 @@ public class User {
 			return false;
 		User other = (User) obj;
 		return Objects.equals(awardedBalance, other.awardedBalance) && dept == other.dept
-				&& Objects.equals(directSupervisor, other.directSupervisor) && Objects.equals(email, other.email)
-				&& Objects.equals(firstName, other.firstName) && Objects.equals(lastName, other.lastName)
+				&& Objects.equals(directSupervisor, other.directSupervisor) && Objects.equals(info, other.info)
 				&& Objects.equals(password, other.password) && Objects.equals(pendingBalance, other.pendingBalance)
-				&& Objects.equals(roles, other.roles) && Objects.equals(session, other.session)
-				&& Objects.equals(username, other.username);
+				&& Objects.equals(role, other.role) && Objects.equals(username, other.username);
 	}
 
-	public Session getSession() {
-		return session;
-	}
-
-	public void setSession(Session session) {
-		this.session = session;
-	}
 
 }

@@ -16,4 +16,9 @@ public class UserService {
 		return userdao.updateUser(u, u2);
 	}
 
+	public User login(User u) {
+		
+		return userdao.login(u);
+	}
+
 }
