@@ -1,7 +1,12 @@
 package com.revature.controllers;
 
+import com.revature.models.Employee;
+import com.revature.models.Role;
+import com.revature.models.Session;
 import com.revature.models.User;
 import com.revature.service.UserService;
+
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +45,6 @@ public class UserController implements CrudHandler{
 			ctx.json(newUser);
 		} else {
 			ctx.status(409);
-			ctx.html("Username already taken.");
 		}
 		
 	}
@@ -63,6 +67,18 @@ public class UserController implements CrudHandler{
 	public void update(Context ctx, String arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+	public void createSession(Context ctx) {
+		User u = ctx.sessionAttribute("loginUser");
+		log.debug(u);
+		if(u == null) {
+			ctx.status(401);
+		}else {
+		Role r = new Employee();
+		log.debug(r);
+		Session s = u.createSession(r);
+		ctx.result(s.getMethods().toString());
+		}
 	}
 	
 	

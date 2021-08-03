@@ -7,4 +7,9 @@ public class RoleFactory {
 		return new Employee();
 	}
 
+	public static String setRole(Role a) {
+		// TODO Auto-generated method stub
+		return a.getName();
+	}
+
 }

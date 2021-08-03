@@ -1,5 +1,6 @@
 package com.revature.models;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 
@@ -8,28 +9,29 @@ public class User {
 	private String username;
 	private String password;
 	private BasicInfo info;
-	private Employee role;
+	private HashSet<Role> roles = new HashSet<Role>();
 	private Department dept;
 	private String directSupervisor;
 	private Double pendingBalance;
 	private Double awardedBalance;
+	private Session session;
 
-	public User(String username, String password, String email, String firstName, String lastName, Employee role,
+	public User(String username, String password, String email, String firstName, String lastName, Role role,
 			Department dept, String directSupervisor) {
 		this();
 		this.username = username;
 		this.password = password;
 		info = new BasicInfo(firstName, lastName,email);
-		this.role = role;
+		roles.add(role);
 		this.dept = dept;
 		this.directSupervisor = directSupervisor;
 	}
-	public User(String username, String password, String email, String firstName, String lastName, String role,
+	public User(String username, String password, String email, String firstName, String lastName, HashSet<Role> roles,
 			String dept, String directSupervisor, double pendingbalance, double awardedbalance) {
 		this.username = username;
 		this.password = password;
 		info = new BasicInfo(firstName, lastName,email);
-		this.role = (Employee) RoleFactory.getRole(role);
+		this.roles = roles;
 		this.dept = Department.valueOf(dept);
 		this.directSupervisor = directSupervisor;
 		this.pendingBalance = pendingbalance;
@@ -67,12 +69,12 @@ public class User {
 		this.info = info;
 	}
 
-	public Role getRole() {
-		return role;
+	public HashSet<Role> getRole() {
+		return roles;
 	}
 
-	public void setRole(Employee role) {
-		this.role = role;
+	public void setRole(HashSet<Role> roles) {
+		this.roles = roles;
 	}
 
 	public Department getDept() {
@@ -107,16 +109,21 @@ public class User {
 		this.awardedBalance = awardedBalance;
 	}
 
+	public Session createSession(Role role) {
+		session = new Session(role);
+		return session;
+		
+	}
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + ", info=" + info + ", role=" + role
+		return "User [username=" + username + ", password=" + password + ", info=" + info + ", role=" + roles
 				+ ", dept=" + dept + ", directSupervisor=" + directSupervisor + ", pendingBalance=" + pendingBalance
 				+ ", awardedBalance=" + awardedBalance + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(awardedBalance, dept, directSupervisor, info, password, pendingBalance, role,
+		return Objects.hash(awardedBalance, dept, directSupervisor, info, password, pendingBalance, roles,
 				username);
 	}
 
@@ -132,7 +139,7 @@ public class User {
 		return Objects.equals(awardedBalance, other.awardedBalance) && dept == other.dept
 				&& Objects.equals(directSupervisor, other.directSupervisor) && Objects.equals(info, other.info)
 				&& Objects.equals(password, other.password) && Objects.equals(pendingBalance, other.pendingBalance)
-				&& Objects.equals(role, other.role) && Objects.equals(username, other.username);
+				&& Objects.equals(roles, other.roles) && Objects.equals(username, other.username);
 	}
 
 
