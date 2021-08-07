@@ -2,11 +2,9 @@ package com.revature.controllers;
 
 import com.revature.models.Employee;
 import com.revature.models.Role;
-import com.revature.models.Session;
 import com.revature.models.User;
+import com.revature.service.SessionService;
 import com.revature.service.UserService;
-
-import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,7 +74,8 @@ public class UserController implements CrudHandler{
 		}else {
 		Role r = new Employee();
 		log.debug(r);
-		Session s = u.createSession(r);
+		SessionService s = u.createSession(r);
+		ctx.sessionAttribute("session", s);
 		ctx.result(s.getMethods().toString());
 		}
 	}

@@ -4,21 +4,27 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Ticket {
 	
+	private String user;
 	private BasicInfo info;
 	private LocalDateTime date;
-	private Location location;
+	private String location;
 	private Double cost;
 	private GradeType gradeType;
 	private String justification;
 	private List<Attachment> attachments;
 	private Period missedTime;
+	private TicketStatus status;
 	
-	public Ticket(BasicInfo info, LocalDateTime date, Location location, Double cost, GradeType gradeType,
+	public Ticket(String user, BasicInfo info, LocalDateTime date, String location, Double cost, GradeType gradeType,
 			String justification, List<Attachment> attachments, Period missedTime) {
 		super();
+		status = TicketStatus.SUPER;
+		this.user = user;
 		this.info = info;
 		this.date = date;
 		this.location = location;
@@ -29,8 +35,24 @@ public class Ticket {
 		this.missedTime = missedTime;
 	}
 
+	public TicketStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(TicketStatus status) {
+		this.status = status;
+	}
+
 	public BasicInfo getInfo() {
 		return info;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	public void setInfo(BasicInfo info) {
@@ -45,11 +67,11 @@ public class Ticket {
 		this.date = date;
 	}
 
-	public Location getLocation() {
+	public String getLocation() {
 		return location;
 	}
 
-	public void setLocation(Location location) {
+	public void setLocation(String location) {
 		this.location = location;
 	}
 
@@ -80,6 +102,9 @@ public class Ticket {
 	public List<Attachment> getAttachments() {
 		return attachments;
 	}
+	public List<UUID> getAttachmentsId(){
+		return attachments.stream().map((m)->m.getId()).collect(Collectors.toList());
+	}
 
 	public void setAttachments(List<Attachment> attachments) {
 		this.attachments = attachments;
@@ -95,7 +120,8 @@ public class Ticket {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(attachments, cost, date, gradeType, info, justification, location, missedTime);
+		return Objects.hash(attachments, cost, date, gradeType, info, justification, location, missedTime, status,
+				user);
 	}
 
 	@Override
@@ -110,14 +136,15 @@ public class Ticket {
 		return Objects.equals(attachments, other.attachments) && Objects.equals(cost, other.cost)
 				&& Objects.equals(date, other.date) && gradeType == other.gradeType && Objects.equals(info, other.info)
 				&& Objects.equals(justification, other.justification) && Objects.equals(location, other.location)
-				&& Objects.equals(missedTime, other.missedTime);
+				&& Objects.equals(missedTime, other.missedTime) && status == other.status
+				&& Objects.equals(user, other.user);
 	}
 
 	@Override
 	public String toString() {
-		return "Ticket [info=" + info + ", date=" + date + ", location=" + location + ", cost=" + cost + ", gradeType="
-				+ gradeType + ", justification=" + justification + ", attachments=" + attachments + ", missedTime="
-				+ missedTime + "]";
+		return "Ticket [user=" + user + ", info=" + info + ", date=" + date + ", location=" + location + ", cost="
+				+ cost + ", gradeType=" + gradeType + ", justification=" + justification + ", attachments="
+				+ attachments + ", missedTime=" + missedTime + ", status=" + status + "]";
 	}
 	
 

@@ -7,13 +7,10 @@ public class Employee implements Role {
 	public Employee() {
 	}
 
-	private Ticket createTicket() {
+	@Create
+	public Ticket create(Ticket t) {
+		
 		return null;
-	}
-
-	@Override
-	public String toString() {
-		return "Employee";
 	}
 
 	@Override

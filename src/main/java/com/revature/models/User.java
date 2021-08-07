@@ -3,6 +3,8 @@ package com.revature.models;
 import java.util.HashSet;
 import java.util.Objects;
 
+import com.revature.service.SessionService;
+
 
 public class User {
 	
@@ -14,7 +16,7 @@ public class User {
 	private String directSupervisor;
 	private Double pendingBalance;
 	private Double awardedBalance;
-	private Session session;
+	private SessionService session;
 
 	public User(String username, String password, String email, String firstName, String lastName, Role role,
 			Department dept, String directSupervisor) {
@@ -109,8 +111,8 @@ public class User {
 		this.awardedBalance = awardedBalance;
 	}
 
-	public Session createSession(Role role) {
-		session = new Session(role);
+	public SessionService createSession(Role role) {
+		session = new SessionService(role);
 		return session;
 		
 	}
