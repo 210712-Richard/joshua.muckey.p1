@@ -1,6 +1,6 @@
 package com.revature.models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +11,7 @@ public class Ticket {
 	
 	private String user;
 	private BasicInfo info;
-	private LocalDateTime date;
+	private LocalDate date;
 	private String location;
 	private Double cost;
 	private GradeType gradeType;
@@ -20,7 +20,7 @@ public class Ticket {
 	private Period missedTime;
 	private TicketStatus status;
 	
-	public Ticket(String user, BasicInfo info, LocalDateTime date, String location, Double cost, GradeType gradeType,
+	public Ticket(String user, BasicInfo info, LocalDate date, String location, Double cost, GradeType gradeType,
 			String justification, List<Attachment> attachments, Period missedTime) {
 		super();
 		status = TicketStatus.SUPER;
@@ -59,11 +59,11 @@ public class Ticket {
 		this.info = info;
 	}
 
-	public LocalDateTime getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(LocalDateTime date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

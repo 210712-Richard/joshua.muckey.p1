@@ -8,10 +8,8 @@ public class Employee implements Role {
 	}
 
 	@Create
-	public Ticket create(Ticket t) {
-		
-		return null;
-	}
+	public void createHook() { //Hook for Controller
+		}
 
 	@Override
 	public String getName() {
