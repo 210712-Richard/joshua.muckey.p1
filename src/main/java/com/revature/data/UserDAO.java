@@ -31,8 +31,13 @@ public class UserDAO {
 	}
 
 	public User updateUser(User u, User u2) {
-		// TODO Auto-generated method stub
-		return null;
+		String query = "Update users set email = ?, firstname = ?, lastname = ?, roles = ?, dept = ?, directsupervisor = ?, pendingbalance = ?, awardedbalance = ? where username = ?";
+		
+		
+		SimpleStatement s =  new SimpleStatementBuilder(query).build();
+		BoundStatement b1 = session.prepare(s).bind(u2.getInfo().getEmail(), u2.getInfo().getFirstName(), u2.getInfo().getLastName(), setRoles(u2.getRole()),u2.getDept().name(), u2.getDirectSupervisor(), u2.getPendingBalance(), u2.getAwardedBalance(), u.getUsername()).setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM);
+		session.execute(b1);
+		return u2;
 	}
 
 	public User login(User u) {

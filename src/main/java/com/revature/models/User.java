@@ -75,6 +75,10 @@ public class User {
 		return roles;
 	}
 
+	public boolean checkRole(Role role) {
+		
+		return roles.stream().anyMatch(p-> p.getClass().equals(role.getClass()));
+	}
 	public void setRole(HashSet<Role> roles) {
 		this.roles = roles;
 	}

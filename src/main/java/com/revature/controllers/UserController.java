@@ -1,6 +1,5 @@
 package com.revature.controllers;
 
-import com.revature.models.Employee;
 import com.revature.models.Role;
 import com.revature.models.User;
 import com.revature.service.SessionService;
@@ -20,7 +19,6 @@ public class UserController implements CrudHandler{
 	
 	public void login(Context ctx) {
 		
-		System.out.println("here");
 		User u = ctx.bodyAsClass(User.class);
 		
 		u = us.login(u);
@@ -63,7 +61,15 @@ public class UserController implements CrudHandler{
 	}
 	@Override
 	public void update(Context ctx, String arg1) {
-		// TODO Auto-generated method stub
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if(loggedUser == null) {
+			ctx.status(409);
+		}
+		User u = ctx.bodyAsClass(User.class);
+		log.debug(u);
+		u = us.updateUser(loggedUser, u);
+		ctx.sessionAttribute("loginUser", u);
+		ctx.json(u);
 		
 	}
 	public void createSession(Context ctx) {
@@ -72,8 +78,13 @@ public class UserController implements CrudHandler{
 		if(u == null) {
 			ctx.status(401);
 		}else {
-		Role r = new Employee();
+		Role r = ctx.bodyAsClass(Role.class);
 		log.debug(r);
+		
+		if(!u.checkRole(r)) {
+			ctx.status(401);
+			return;
+		}
 		SessionService s = u.createSession(r);
 		ctx.sessionAttribute("session", s);
 		ctx.result(s.getMethods().toString());

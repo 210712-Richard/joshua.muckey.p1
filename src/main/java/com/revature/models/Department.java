@@ -3,7 +3,7 @@ package com.revature.models;
 public enum Department implements DepartmentHead{
 
 	ACCOUNTING(){
-		private String departmentHeadUserName;
+		private String departmentHeadUserName = "josh";
 		
 		public String getHead() {
 			return departmentHeadUserName;
@@ -15,7 +15,7 @@ public enum Department implements DepartmentHead{
 	,
 	ENGINEERING(){
 
-		private String departmentHeadUserName;
+		private String departmentHeadUserName = "bob";
 		
 		@Override
 		public String getHead() {
@@ -27,5 +27,19 @@ public enum Department implements DepartmentHead{
 			this.departmentHeadUserName = departmentHeadUserName;
 		}
 		
+	}
+	,
+	BENCO(){
+		private String departmentHeadUserName = "ben";
+		
+		@Override
+		public String getHead() {
+			return departmentHeadUserName;
+		}
+
+		@Override
+		public void setHead(String departmentHeadUserName) {
+			this.departmentHeadUserName = departmentHeadUserName;
+		}
 	}
 }

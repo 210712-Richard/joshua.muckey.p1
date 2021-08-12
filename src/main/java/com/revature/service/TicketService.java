@@ -1,5 +1,8 @@
 package com.revature.service;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import com.revature.data.TicketDAO;
@@ -10,16 +13,52 @@ public class TicketService {
 
 	private TicketDAO ticketDao = new TicketDAO();
 
-	public Ticket createTicket(Ticket ticket, String supervisor) {
-		Department dept = headChecker(supervisor);
-		if(dept != null) {
+	public Ticket createTicket(Ticket ticket, String supervisor, Department dept) {
+		
+		if(headChecker(supervisor) || !ticket.getAttachments().isEmpty()) {
 			return ticketDao.createHead(ticket,dept);
 		}
-		return ticketDao.createSuper(ticket, supervisor);
+		return ticketDao.createSuper(ticket, supervisor, dept);
 	}
 	
-	private Department headChecker(String username) {
-		return Stream.of(Department.values()).filter(p -> p.getHead().equals(username)).findFirst().orElse(null);
+	private boolean headChecker(String username) {
+		return Stream.of(Department.values()).anyMatch(p -> p.getHead().equals(username));
+	}
+
+	public List<Ticket> getMyTickets(String username) {
+		return ticketDao.getMyTickets(username);
+	}
+	public List<Ticket> getSuperTickets(String supervisor){
+		return ticketDao.getSuperTickets(supervisor);
+	}
+
+	public List<Ticket> getHeadTickets(Department dept) {
+		// TODO Auto-generated method stub
+		return ticketDao.getHeadTickets(dept);
+	}
+	public List<Ticket> getBenTickets() {
+		// TODO Auto-generated method stub
+		return ticketDao.getBenCoTickets();
 	}
 	
+
+	public Ticket approveSuperTicket(String supervisor, String queryParam) {
+		return ticketDao.approveSuperTicket(supervisor, queryParam);
+		
+	}
+
+	public Ticket approveHeadTicket(Department dept, String queryParam) {
+		return ticketDao.approveHeadTicket(dept, queryParam);
+	}
+
+	public Ticket approveBenCoTicket(String queryParam) {
+		// TODO Auto-generated method stub
+		return ticketDao.approveBenCoTicket(queryParam);
+	}
+
+	public InputStream getTicketFiles(String id) {
+		// TODO Auto-generated method stub
+		return ticketDao.getTicketFile(id);
+	}
+
 }

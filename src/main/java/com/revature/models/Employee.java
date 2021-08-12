@@ -11,6 +11,15 @@ public class Employee implements Role {
 	public void createHook() { //Hook for Controller
 		}
 
+	@GetMyTickets
+	public void getMyTicketHook() { //Hook for Controller
+	}
+	
+	@GetTicketFiles
+	public void getTicketFilesHook() { //Hook for Controller
+		
+	}
+	
 	@Override
 	public String getName() {
 		return name;
