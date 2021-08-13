@@ -14,7 +14,9 @@ public class Benco extends Employee {
 	public void getBenCoTicketHook() { //Hook
 		
 	}
-	
+	@ApproveGrade
+	public void approveGrade() { //Hook
+	}
 	@Override
 	public String getName() {
 		return name;

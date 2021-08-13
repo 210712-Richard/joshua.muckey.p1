@@ -52,13 +52,21 @@ public class TicketService {
 	}
 
 	public Ticket approveBenCoTicket(String queryParam) {
-		// TODO Auto-generated method stub
+	
 		return ticketDao.approveBenCoTicket(queryParam);
 	}
 
 	public InputStream getTicketFiles(String id) {
-		// TODO Auto-generated method stub
+		
 		return ticketDao.getTicketFile(id);
+	}
+
+	public Ticket insertGrade(String fileid, String username, String ticketid) {
+		
+		return ticketDao.insertGrade(fileid, username, ticketid);
+	}
+	public Ticket approveGrade(String id, double percentage) {
+		return ticketDao.approveGrade(id, percentage);
 	}
 
 }

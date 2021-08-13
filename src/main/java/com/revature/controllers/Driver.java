@@ -36,6 +36,8 @@ public class Driver {
 				get("bencotickets", tc::getBen);
 				patch("headtickets/:id", tc::approveHeadTicket);
 				patch("bencotickets/:id", tc::approveBenCoTicket);
+				patch("tickets/uploadGrade", tc::insertGrade);
+				patch("bencotickets/approveGrade", tc::approveGrade);
 			});
 
 		});

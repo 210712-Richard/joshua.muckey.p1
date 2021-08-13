@@ -5,7 +5,6 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.DefaultConsistencyLevel;
@@ -13,6 +12,7 @@ import com.datastax.oss.driver.api.core.cql.BatchStatement;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.DefaultBatchType;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.cql.SimpleStatementBuilder;
 import com.revature.models.BasicInfo;
@@ -83,7 +83,7 @@ public class TicketDAO {
 		BoundStatement b1 = session.prepare(s1).bind(ticket.getUser(), ticket.getInfo().getEmail(),
 				ticket.getInfo().getFirstName(), ticket.getInfo().getLastName(), ticket.getDate(), ticket.getLocation(),
 				ticket.getCost(), ticket.getGradeType().name(), ticket.getJustification(), ticket.getAttachments(),
-				ticket.getMissedTime().getDays(), ticket.getStatus().name(), ticket.getId(),ticket.getDept().name());
+				ticket.getMissedTime().getDays(), ticket.getStatus().name(), ticket.getId(), ticket.getDept().name());
 		return b1;
 	}
 
@@ -239,9 +239,9 @@ public class TicketDAO {
 			SimpleStatement s2 = new SimpleStatementBuilder(q2)
 					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
 
-			BoundStatement b2 = session.prepare(s2).bind(target.getUser(),
-					target.getInfo().getEmail(), target.getInfo().getFirstName(), target.getInfo().getLastName(),
-					target.getDate(), target.getLocation(),target.getCost() ,target.getGradeType().name(), target.getJustification(),
+			BoundStatement b2 = session.prepare(s2).bind(target.getUser(), target.getInfo().getEmail(),
+					target.getInfo().getFirstName(), target.getInfo().getLastName(), target.getDate(),
+					target.getLocation(), target.getCost(), target.getGradeType().name(), target.getJustification(),
 					target.getAttachments(), target.getMissedTime().getDays(), target.getStatus().name(),
 					target.getId(), target.getDept().name());
 			session.execute(b2);
@@ -284,6 +284,21 @@ public class TicketDAO {
 			BoundStatement b2 = session.prepare(s2).bind(target.getStatus().name(), target.getUser(), target.getId());
 			session.execute(b2);
 
+			String q4 = "Select pendingbalance from users where username=" + target.getUser();
+
+			SimpleStatement s4 = new SimpleStatementBuilder(q4)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+
+			ResultSet set = session.execute(s4);
+			Double x = set.one().getDouble("pendingbalance");
+			Double ans = x + target.getCost();
+
+			String q5 = "Update users set pendingbalance=? where username=?";
+			SimpleStatement s5 = new SimpleStatementBuilder(q5)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+			BoundStatement b5 = session.prepare(s5).bind(ans, target.getUser());
+			session.execute(b5);
+
 			String q3 = "Update bencotickets set ticketstatus=? where id=?";
 			SimpleStatement s3 = new SimpleStatementBuilder(q3)
 					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
@@ -294,13 +309,93 @@ public class TicketDAO {
 		return null;
 	}
 
-	private void autoApprove(Ticket t) {
-
-	}
-
 	public InputStream getTicketFile(String id) {
-		// TODO Auto-generated method stub
 		return S3Util.getInstance().getObject(id);
 	}
 
+	public Ticket insertGrade(String fileid, String username, String ticketid) {
+		String q1 = "Select * from tickets where username=? and id=?";
+
+		SimpleStatement s1 = new SimpleStatementBuilder(q1).build();
+		BoundStatement b1 = session.prepare(s1).bind(username, UUID.fromString(ticketid));
+		List<Ticket> tickets = new ArrayList<Ticket>();
+		ResultSet rs = session.execute(b1);
+		Row row = rs.one();
+			Ticket t = new Ticket(row.getString("username"),
+					new BasicInfo(row.getString("firstname"), row.getString("lastname"), row.getString("email")),
+					row.getLocalDate("date"), row.getString("location"), Department.valueOf(row.getString("dept")),
+					row.getDouble("cost"), GradeType.valueOf(row.getString("gradetype")),
+					row.getString("justification"), row.getList("attachmentuuids", UUID.class),
+					Period.ofDays(row.getInt("missed")), row.getUuid("id"));
+		t.getAttachments().add(UUID.fromString(ticketid));
+		String q2 = "Update tickets set attachmentsuuid=? ticketstatus=? where username=? and id=?";
+		SimpleStatement s2 = new SimpleStatementBuilder(q2).build();
+		BoundStatement b2 = session.prepare(s2).bind(t.getAttachments(), TicketStatus.PENDING_COMPLETION.name(),
+				username, t.getId());
+		session.execute(b2);
+
+		String q3 = "Insert into bencotickets (username, email, firstname, lastname, date, location, cost, gradetype, justification, attachmentuuids, missed, ticketstatus, id, dept) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+		SimpleStatement s3 = new SimpleStatementBuilder(q3).setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM)
+				.build();
+
+		BoundStatement b3 = session.prepare(s3).bind(t.getUser(), t.getInfo().getEmail(), t.getInfo().getFirstName(),
+				t.getInfo().getLastName(), t.getDate(), t.getLocation(), t.getCost(), t.getGradeType().name(),
+				t.getJustification(), t.getAttachments(), t.getMissedTime().getDays(), t.getStatus().name(), t.getId(),
+				t.getDept().name());
+		session.execute(b3);
+
+		return t;
+	}
+
+	public Ticket approveGrade(String id, double percentage) {
+		String q1 = "Select * from bencotickets where id=?";
+
+		SimpleStatement s1 = new SimpleStatementBuilder(q1).build();
+		BoundStatement b1 = session.prepare(s1).bind(UUID.fromString(id));
+		ResultSet rs = session.execute(b1);
+		Row row =rs.one();
+		if(row == null) {
+			return null;
+		}
+		Ticket target = new Ticket(row.getString("username"),
+					new BasicInfo(row.getString("firstname"), row.getString("lastname"), row.getString("email")),
+					row.getLocalDate("date"), row.getString("location"), Department.valueOf(row.getString("dept")),
+					row.getDouble("cost"), GradeType.valueOf(row.getString("gradetype")),
+					row.getString("justification"), row.getList("attachmentuuids", UUID.class),
+					Period.ofDays(row.getInt("missed")), row.getUuid("id"));
+		
+		if (target != null) {
+			target.setStatus(TicketStatus.FIN);
+			String q2 = "Update tickets set ticketstatus=? where username=? and id =?";
+
+			SimpleStatement s2 = new SimpleStatementBuilder(q2)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+
+			BoundStatement b2 = session.prepare(s2).bind(target.getStatus().name(), target.getUser(), target.getId());
+			session.execute(b2);
+
+			String q4 = "Select pendingbalance from users where username=?" + target.getUser();
+
+			SimpleStatement s4 = new SimpleStatementBuilder(q4)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+
+			ResultSet set = session.execute(s4);
+			Double x = set.one().getDouble("pendingbalance");
+			Double ans = target.getCost()-x;
+
+			String q5 = "Update users set awardedalance=? pendingbalance=? where username=?";
+			SimpleStatement s5 = new SimpleStatementBuilder(q5)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+			BoundStatement b5 = session.prepare(s5).bind(x*percentage, ans , target.getUser());
+			session.execute(b5);
+
+			String q3 = "Delete from bencotickets where id=?";
+			SimpleStatement s3 = new SimpleStatementBuilder(q3)
+					.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM).build();
+			BoundStatement b3 = session.prepare(s3).bind(target.getStatus().name(), target.getId());
+			session.execute(b3);
+		}
+		return target;
+	}
 }

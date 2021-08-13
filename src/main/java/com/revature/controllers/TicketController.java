@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.revature.models.ApproveBenCoTicket;
+import com.revature.models.ApproveGrade;
 import com.revature.models.ApproveHeadTicket;
 import com.revature.models.ApproveSuperTicket;
 import com.revature.models.Create;
@@ -21,6 +22,7 @@ import com.revature.models.GetHeadTickets;
 import com.revature.models.GetMyTickets;
 import com.revature.models.GetSuperTickets;
 import com.revature.models.GetTicketFiles;
+import com.revature.models.InsertGrade;
 import com.revature.models.Ticket;
 import com.revature.models.User;
 import com.revature.service.SessionService;
@@ -243,7 +245,56 @@ public class TicketController implements CrudHandler {
 		}
 		ctx.json(ts.approveBenCoTicket(ctx.pathParam("id")));
 	}
+	
+	public void insertGrade(Context ctx) {
+		setup(ctx);
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if (ss == null || loggedUser == null) {
+			ctx.status(409);
+		}
+		Object o = ss.getMethods().stream().findFirst().filter(p -> p.isAnnotationPresent(InsertGrade.class))
+				.orElse(null);
+		if (o == null) {
+			ctx.status(409);
+		}
+		if(!(ctx.formParamMap().get("filename").get(0).isEmpty())) {
+			List<UploadedFile> files = ctx.uploadedFiles().stream().collect(Collectors.toList());
+			if (!files.isEmpty()) {
+				UploadedFile file = files.get(0);
+				UUID id = UUID.randomUUID();
+				byte[] bytes = null;
+				try {
+					bytes = new byte[file.getContent().available()];
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					file.getContent().read(bytes);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				S3Util.getInstance().uploadToBucket(id.toString(), bytes);
+				ctx.json(ts.insertGrade(ctx.formParam("fileid"), loggedUser.getUsername(), ctx.formParam("ticketid")));
+			}
+		}
+	}
 
+	public void approveGrade(Context ctx) {
+		setup(ctx);
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if (ss == null || loggedUser == null) {
+			ctx.status(409);
+		}
+		Object o = ss.getMethods().stream().findFirst().filter(p -> p.isAnnotationPresent(ApproveGrade.class))
+				.orElse(null);
+		if (o == null) {
+			ctx.status(409);
+		}
+		Double x = Double.parseDouble(ctx.formParam("percent"));
+		ctx.json(ts.approveGrade(ctx.formParam("id"), x));
+	}
 	private void setup(Context ctx) {
 		ss = ctx.sessionAttribute("session");
 	}

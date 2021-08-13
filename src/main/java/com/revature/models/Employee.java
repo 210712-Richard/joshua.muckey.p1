@@ -19,6 +19,9 @@ public class Employee implements Role {
 	public void getTicketFilesHook() { //Hook for Controller
 		
 	}
+	@InsertGrade
+	public void insertGradeHook() { //Hook for Controller
+	}
 	
 	@Override
 	public String getName() {
