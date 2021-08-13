@@ -42,6 +42,22 @@ public class Ticket {
 		this.attachments = attachments;
 		this.missedTime = missedTime;
 	}
+	public Ticket(String user, BasicInfo info, LocalDate date, String location,Department dept, Double cost, GradeType gradeType,
+			String justification, List<UUID> attachments, Period missedTime, UUID id, TicketStatus status) {
+		super();
+		this.status = status;
+		this.id = id;
+		this.dept = dept;
+		this.user = user;
+		this.info = info;
+		this.date = date;
+		this.location = location;
+		this.cost = cost;
+		this.gradeType = gradeType;
+		this.justification = justification;
+		this.attachments = attachments;
+		this.missedTime = missedTime;
+	}
 	public Ticket() {
 		id = UUID.randomUUID();
 	}

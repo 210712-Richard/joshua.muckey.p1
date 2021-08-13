@@ -31,7 +31,16 @@ public class UserController implements CrudHandler{
 		}
 		ctx.status(401);
 	}
+	public void logout(Context ctx) {
+		log.debug("logout!");
+		ctx.result("Goodbye! " + ((User)ctx.sessionAttribute("loginUser")).getUsername());
+		ctx.req.getSession().invalidate();
+	}
 	
+	public void closeSession(Context ctx) {
+		log.debug("Session closed");
+		ctx.sessionAttribute("session", null);
+	}
 	@Override
 	public void create(Context ctx) {
 		User u = ctx.bodyAsClass(User.class);

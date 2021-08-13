@@ -50,6 +50,10 @@ public class TicketService {
 	public Ticket approveHeadTicket(Department dept, String queryParam) {
 		return ticketDao.approveHeadTicket(dept, queryParam);
 	}
+	
+	public Ticket disapproveHeadTicket(Department dept, String queryParam) {
+		return ticketDao.disapproveHeadTicket(dept, queryParam);
+	}
 
 	public Ticket approveBenCoTicket(String queryParam) {
 	
@@ -67,6 +71,15 @@ public class TicketService {
 	}
 	public Ticket approveGrade(String id, double percentage) {
 		return ticketDao.approveGrade(id, percentage);
+	}
+
+	public Ticket disroveSuperTicket(String supervisor, String queryParam) {
+		return ticketDao.disapproveSuperTicket(supervisor, queryParam);
+	}
+
+	public Ticket disapproveBenCoTicket(String queryParam) {
+		// TODO Auto-generated method stub
+		return ticketDao.disapproveBenCoTicket(queryParam);
 	}
 
 }

@@ -213,8 +213,22 @@ public class TicketController implements CrudHandler {
 		if (o == null) {
 			ctx.status(409);
 		}
-		ctx.json(ts.approveSuperTicket(loggedUser.getUsername(), ctx.queryParam("id")));
+		ctx.json(ts.approveSuperTicket(loggedUser.getUsername(), ctx.pathParam("id")));
 
+	}
+	
+	public void disapproveSuperTicket(Context ctx) {
+		setup(ctx);
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if (ss == null || loggedUser == null) {
+			ctx.status(409);
+		}
+		Object o = ss.getMethods().stream().findFirst().filter(p -> p.isAnnotationPresent(ApproveSuperTicket.class))
+				.orElse(null);
+		if (o == null) {
+			ctx.status(409);
+		}
+		ctx.json(ts.disroveSuperTicket(loggedUser.getUsername(), ctx.pathParam("id")));
 	}
 
 	public void approveHeadTicket(Context ctx) {
@@ -231,6 +245,20 @@ public class TicketController implements CrudHandler {
 		ctx.json(ts.approveHeadTicket(loggedUser.getDept(), ctx.pathParam("id")));
 
 	}
+	
+	public void disapproveHeadTicket(Context ctx) {
+		setup(ctx);
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if (ss == null || loggedUser == null) {
+			ctx.status(409);
+		}
+		Object o = ss.getMethods().stream().findFirst().filter(p -> p.isAnnotationPresent(ApproveHeadTicket.class))
+				.orElse(null);
+		if (o == null) {
+			ctx.status(409);
+		}
+		ctx.json(ts.disapproveHeadTicket(loggedUser.getDept(), ctx.pathParam("id")));
+	}
 
 	public void approveBenCoTicket(Context ctx) {
 		setup(ctx);
@@ -244,6 +272,20 @@ public class TicketController implements CrudHandler {
 			ctx.status(409);
 		}
 		ctx.json(ts.approveBenCoTicket(ctx.pathParam("id")));
+	}
+	
+	public void disapproveBenCoTicket(Context ctx) {
+		setup(ctx);
+		User loggedUser = ctx.sessionAttribute("loginUser");
+		if (ss == null || loggedUser == null) {
+			ctx.status(409);
+		}
+		Object o = ss.getMethods().stream().findFirst().filter(p -> p.isAnnotationPresent(ApproveBenCoTicket.class))
+				.orElse(null);
+		if (o == null) {
+			ctx.status(409);
+		}
+		ctx.json(ts.disapproveBenCoTicket(ctx.pathParam("id")));
 	}
 	
 	public void insertGrade(Context ctx) {
@@ -276,7 +318,7 @@ public class TicketController implements CrudHandler {
 					e.printStackTrace();
 				}
 				S3Util.getInstance().uploadToBucket(id.toString(), bytes);
-				ctx.json(ts.insertGrade(ctx.formParam("fileid"), loggedUser.getUsername(), ctx.formParam("ticketid")));
+				ctx.json(ts.insertGrade(id.toString(), loggedUser.getUsername(), ctx.formParam("ticketid")));
 			}
 		}
 	}

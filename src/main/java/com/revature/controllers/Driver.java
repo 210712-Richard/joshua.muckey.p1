@@ -4,6 +4,7 @@ import static io.javalin.apibuilder.ApiBuilder.crud;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.patch;
+import static io.javalin.apibuilder.ApiBuilder.put;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -34,14 +35,19 @@ public class Driver {
 				get("supertickets",tc::getSuper);
 				get("headtickets",tc::getHead);
 				get("bencotickets", tc::getBen);
+				patch("supertickets/:id", tc::approveSuperTicket);
+				patch("supertickets/:id/disapprove", tc::disapproveSuperTicket);
 				patch("headtickets/:id", tc::approveHeadTicket);
+				patch("headtickets/:id/disapprove", tc::disapproveHeadTicket);
 				patch("bencotickets/:id", tc::approveBenCoTicket);
+				patch("bencotickets/:id/disapprove", tc::disapproveBenCoTicket);
 				patch("tickets/uploadGrade", tc::insertGrade);
-				patch("bencotickets/approveGrade", tc::approveGrade);
+				put("bencotickets/approveGrade", tc::approveGrade);
 			});
 
 		});
 		app.get("/login", uc::login);
-		
+		app.delete("/logout", uc::logout);
+		app.delete("users/closeSession", uc::closeSession);
 	}
 }
