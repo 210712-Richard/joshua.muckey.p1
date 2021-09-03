@@ -38,7 +38,7 @@ To run the project locally, ensure that the following have been setup:
 
 Clone the project using the link:
 ```sh 
-[git clone https://github.com/210712-Richard/michael.mcinerney.p1](https://github.com/210712-Richard/joshua.muckey.p1)
+[git clone https://github.com/210712-Richard/joshua.muckey.p1](https://github.com/210712-Richard/joshua.muckey.p1)
 ```
 Set two environmental varaibles, AWS_USER and AWS_PASS, to a AWS IAM user with programmtic access to the Keyspace being used.
 Go into the directory and build the application using:
